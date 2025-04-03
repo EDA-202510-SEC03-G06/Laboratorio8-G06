@@ -104,20 +104,49 @@ def delete_max_tree(root):
     
     pass
 
-
-def key_set_tree(root):
-    """Devuelve una lista con todas las llaves de la tabla de simbolos.
-    Es usada en la función key_set()"""
+def floor(my_bst, key):
+    """Retorna la llave que precede a la llave key en la tabla de simbolos.
+    Si la llave existe, retorna la misma llave. Si no existe, retorna la llave predecedente más cercana como si la llave key existiera en la tabla. Por ejemplo, si la tabla contiene las llaves [1, 3, 5, 7, 9] y se busca la llave 6, la función retornará 5.
+    Usa la función floor_key() para encontrar la llave predecesora a key"""
     
     pass
-def values(root):
-    """Retorna todas los valores del arbol que se encuentren entre [key_initial, key_final]
-    Usa la función values_range() para encontrar los valores en el rango especificado"""
+
+def floor_key(root, key):
+    """Retorna la llave que precede a la llave key en la tabla de simbolos.
+    Si la llave existe, retorna la misma llave. Si no existe, retorna la llave predecedente más cercana como si la llave key existiera en la tabla.
+    Es usada en la función floor() Usa la función floor_key() para encontrar la llave predecesora a key"""
+    
+    pass
+
+
+def ceiling(my_bst, key):
+    """Retorna la llave que sucede a la llave key en la tabla de simbolos.
+    Si la llave existe, retorna la misma llave. Si no existe, retorna la llave sucesora más cercana como si la llave key existiera en la tabla. Por ejemplo, si la tabla contiene las llaves [1, 3, 5, 7, 9] y se busca la llave 6, la función retornará 7.
+    Usa la función ceiling_key() para encontrar la llave sucesora a key"""
 
     pass
 
-def values_range(root, key_initial, key_final):
-    """Función de comparación por defecto. Compara una llave con la llave de un elemento llave-valor."""
+def select(my_bst, pos):
+    """Retorna la siguiente llave a la k-esima llave de izquierda a derecha de la tabla de simbolos.
+    Usa la función select_key() para encontrar la llave en la posición pos"""
+    
+    pass
+
+def select_key(root, key):
+    """Retorna la siguiente llave a la k-esima llave de izquierda a derecha de la tabla de simbolos.
+    Es usada en la función select() Usa la función select_key() para encontrar la llave en la posición pos"""   
+    
+    pass 
+
+def rank(my_bst, key):
+    """Retorna el número de llaves en la tabla que son estrictamente predecesoras a key Por ejemplo, si la tabla contiene las llaves [1, 3, 5, 7, 9] y se busca la llave 6, la función retornará 3.
+    Usa la función rank_keys() para encontrar el número de llaves predecesoras a keyo""" 
+    
+    pass
+
+def rank_keys(root, key):
+    """Retorna el número de llaves en la tabla que son estrictamente predecesoras a key Por ejemplo, si la tabla contiene las llaves [1, 3, 5, 7, 9] y se busca la llave 6, la función retornará 3.
+    Es usada en la función rank() Usa la función rank_keys() para encontrar el número de llaves predecesoras a key""" 
     
     pass
 
@@ -129,6 +158,34 @@ def height(root):
 def heigth_tree(root):
     """Retorna la altura del arbol de busqueda
     Es usada en la "función height()" Usa la función height_tree() para encontrar la altura del arbol"""
+    
+    pass
+
+def keys(my_bst, key_initial, key_final):
+    """Retorna todas las llaves del arbol que se encuentren entre [key_initial, key_final].
+    Usa la función keys_range() para encontrar las llaves en el rango especificado"""   
+    
+    pass
+
+def keys_range(root, key_initial, key_final):   
+    """Retorna todas las llaves del arbol que se encuentren entre [key_initial, key_final].
+    Es usada en la función keys() Usa la función keys_range() para encontrar las llaves en el rango especificado"""
+    
+    pass
+
+def values(root):
+    """Retorna todas los valores del arbol que se encuentren entre [key_initial, key_final]
+    Usa la función values_range() para encontrar los valores en el rango especificado"""
+
+    pass
+
+def values_range(root, key_initial, key_final):
+    """Función de comparación por defecto. Compara una llave con la llave de un elemento llave-valor."""
+    
+    pass
+
+def default_compare(key, element):
+    """Función de comparación por defecto. Compara una llave con la llave de un elemento llave-valor."""
     
     pass
 
