@@ -273,11 +273,11 @@ def keys_range(root, key_initial, key_final, result):
     Es usada en la función keys() Usa la función keys_range() para encontrar las llaves en el rango especificado"""
     if root is None:
         return
-    if key_initial < root["key"]
+    if key_initial < root["key"]:
         keys_range(root["left"], key_initial, key_final, result)
     if key_initial <= root["key"] <= key_final:
         result.append(root["key"])
-    if key_final > root["key"]
+    if key_final > root["key"]:
         keys_range(root["right"], key_initial, key_final, result)
 def values(root):
     """Retorna todas los valores del arbol que se encuentren entre [key_initial, key_final]
