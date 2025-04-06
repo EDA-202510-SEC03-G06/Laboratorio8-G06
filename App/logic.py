@@ -29,11 +29,11 @@ import csv
 import datetime
 
 # TODO Realice la importación del Árbol Binario Ordenado
-from DataStructures.List import binary_search_tree as bst
+from DataStructures.Tree import binary_search_tree as bst
 # TODO Realice la importación de ArrayList (al) como estructura de datos auxiliar para sus requerimientos
 from DataStructures.List import array_list as al
 # TODO Realice la importación de LinearProbing (lp) como estructura de datos auxiliar para sus requerimientos
-from DataStructures.List import map_linear_probing as lp
+from DataStructures.Map import map_linear_probing as lp
 
 data_dir = os.path.dirname(os.path.realpath('__file__')) + '/Data/'
 
@@ -53,8 +53,8 @@ def new_logic():
                 }
 
     analyzer['crimes'] = al.new_list()
-    # TODO completar la creación del mapa ordenado
-    analyzer['dateIndex'] = None
+    # TODO completar la creación del mapa ordenado - HECHO
+    analyzer['dateIndex'] = bst.new_map()
     
     return analyzer
 
@@ -96,13 +96,16 @@ def update_date_index(map, crime):
     """
     occurreddate = crime['OCCURRED_ON_DATE']
     crimedate = datetime.datetime.strptime(occurreddate, '%Y-%m-%d %H:%M:%S')
-    entry = bst.get(map, crimedate.date())
+    date_key = crimedate.date()
+    entry = bst.get(map, date_key)
     if entry is None:
-        # TODO Realizar el caso en el que no se encuentra la fecha
-        pass
+        # TODO Realizar el caso en el que no se encuentra la fecha - HECHO
+        datentry = new_data_entry(crime)
+        add_date_index(datentry, crime)
+        bst.put(map, date_key, datentry)
     else:
         datentry = entry
-    add_date_index(datentry, crime)
+        add_date_index(datentry, crime)
     return map
 
 
@@ -117,12 +120,15 @@ def add_date_index(datentry, crime):
     al.add_last(lst, crime)
     offenseIndex = datentry['offenseIndex']
     offentry = lp.get(offenseIndex, crime['OFFENSE_CODE_GROUP'])
+    offentry = lp.get(offenseIndex, offense_code)
     if (offentry is None):
         # TODO Realice el caso en el que no se encuentre el tipo de crimen
-        pass
+        ofentry = new_offense_entry(offense_code, crime)
+        al.add_last(ofentry['lstoffenses'], crime)
+        lp.put(offenseIndex, offense_code, ofentry)
     else:
-        # TODO Realice el caso en el que se encuentre el tipo de crimen
-        pass
+        al.add_last(offentry['lstoffenses'], crime)
+
     return datentry
 
 
@@ -166,7 +172,7 @@ def index_height(analyzer):
     Altura del arbol
     """
     # TODO Completar la función de consulta
-    pass
+    return bst.height(analyzer['dateIndex'])
 
 
 def index_size(analyzer):
@@ -175,7 +181,6 @@ def index_size(analyzer):
     """
     # TODO Completar la función de consulta
     pass
-
 
 def min_key(analyzer):
     """
