@@ -68,6 +68,7 @@ def test_new_binary_search_tree():
 
 @handle_not_implemented
 def test_put():
+    my_bst = bst.new_map()
     empty_bst = setup_tests()
     result = bst.put(empty_bst, 1, 1)
 

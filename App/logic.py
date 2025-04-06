@@ -119,8 +119,9 @@ def add_date_index(datentry, crime):
     lst = datentry['lstcrimes']
     al.add_last(lst, crime)
     offenseIndex = datentry['offenseIndex']
-    offentry = lp.get(offenseIndex, crime['OFFENSE_CODE_GROUP'])
+    offense_code = crime['OFFENSE_CODE_GROUP']
     offentry = lp.get(offenseIndex, offense_code)
+    
     if (offentry is None):
         # TODO Realice el caso en el que no se encuentre el tipo de crimen
         ofentry = new_offense_entry(offense_code, crime)
@@ -130,7 +131,6 @@ def add_date_index(datentry, crime):
         al.add_last(offentry['lstoffenses'], crime)
 
     return datentry
-
 
 def new_data_entry(crime):
     """
@@ -180,14 +180,12 @@ def index_size(analyzer):
     Numero de elementos en el indice
     """
     # TODO Completar la función de consulta
-    pass
 
 def min_key(analyzer):
     """
     Llave mas pequena
     """
     # TODO Completar la función de consulta
-    pass
 
 
 def max_key(analyzer):
@@ -195,7 +193,6 @@ def max_key(analyzer):
     Llave mas grande
     """
     # TODO Completar la función de consulta
-    pass
 
 
 def get_crimes_by_range(analyzer, initialDate, finalDate):
@@ -203,7 +200,6 @@ def get_crimes_by_range(analyzer, initialDate, finalDate):
     Retorna el numero de crimenes en un rago de fechas.
     """
     # TODO Completar la función de consulta
-    pass
 
 
 def get_crimes_by_range_code(analyzer, initialDate, offensecode):
@@ -212,4 +208,4 @@ def get_crimes_by_range_code(analyzer, initialDate, offensecode):
     de un tipo especifico.
     """
     # TODO Completar la función de consulta
-    pass
+    
