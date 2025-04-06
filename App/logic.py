@@ -180,14 +180,14 @@ def index_size(analyzer):
     Numero de elementos en el indice
     """
     # TODO Completar la función de consulta
-    pass
+    return bst.size(analyzer['dateIndex'])
 
 def min_key(analyzer):
     """
     Llave mas pequena
     """
     # TODO Completar la función de consulta
-    pass
+    return bst.min_key(analyzer['dateIndex'])
 
 
 def max_key(analyzer):
@@ -195,7 +195,7 @@ def max_key(analyzer):
     Llave mas grande
     """
     # TODO Completar la función de consulta
-    pass
+    return bst.max_key(analyzer['dateIndex'])
 
 
 def get_crimes_by_range(analyzer, initialDate, finalDate):
@@ -203,7 +203,13 @@ def get_crimes_by_range(analyzer, initialDate, finalDate):
     Retorna el numero de crimenes en un rago de fechas.
     """
     # TODO Completar la función de consulta
-
+    total_crimes = 0
+    fecha_inicial = datetime.datetime.strptime(initialDate, "%Y-%m-%d").date()
+    fecha_final = datetime.datetime.strptime(finalDate, "%Y-%m-%d").date()
+    crimes = bst.values(analyzer["dateIndex"], fecha_inicial, fecha_final)
+    for date_entry in crimes:
+        total_crimes += al.size(date_entry["lstcrimes"])
+    return total_crimes
 
 def get_crimes_by_range_code(analyzer, initialDate, offensecode):
     """
@@ -211,4 +217,10 @@ def get_crimes_by_range_code(analyzer, initialDate, offensecode):
     de un tipo especifico.
     """
     # TODO Completar la función de consulta
-    
+    fecha = datetime.datetime.strptime(initialDate, "%Y-%m-%d").date()
+    date_entry = bst.get(analyzer["dateIndex"], fecha)
+    if date_entry is not None:
+        offense_entry = lp.get(date_entry["offenseIndex"], offensecode)
+        if offense_entry is not None:
+            return al.size(offense_entry["lstoffenses"])
+    return 0
