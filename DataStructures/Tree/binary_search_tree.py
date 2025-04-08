@@ -1,3 +1,5 @@
+from DataStructures.List import single_linked_list as sl
+
 def new_map():
     """Crea un nuevo árbol de búsqueda"""
     
@@ -315,21 +317,26 @@ def heigth_tree(root):
 def keys(my_bst, key_initial, key_final):
     """Retorna todas las llaves del arbol que se encuentren entre [key_initial, key_final].
     Usa la función keys_range() para encontrar las llaves en el rango especificado"""   
-    result = []
-    keys_range(my_bst, key_initial, key_final, result)
-    return result
+    list_key = []
+    keys_range(my_bst, key_initial, key_final, list_key)
+    return list_key
 
-def keys_range(root, key_initial, key_final, result):   
+def keys_range(root, key_initial, key_final, list_key):   
     """Retorna todas las llaves del arbol que se encuentren entre [key_initial, key_final].
     Es usada en la función keys() Usa la función keys_range() para encontrar las llaves en el rango especificado"""
     if root is None:
-        return
+        return  
     if key_initial < root["key"]:
-        keys_range(root["left"], key_initial, key_final, result)
+        keys_range(root["left"], key_initial, key_final, list_key)
     if key_initial <= root["key"] <= key_final:
-        result.append(root["key"])
-    if key_final > root["key"]:
-        keys_range(root["right"], key_initial, key_final, result)
+        sl.add_last(list_key, root["key"])
+    if root["key"] < key_final:
+        keys_range(root["right"], key_initial, key_final, list_key)
+
+def keys(my_bst, key_initial, key_final):
+    result_list = sl.new_list() 
+    keys_range(my_bst["root"], key_initial, key_final, result_list)
+    return result_list
 def values(root):
     """Retorna todas los valores del arbol que se encuentren entre [key_initial, key_final]
     Usa la función values_range() para encontrar los valores en el rango especificado"""
@@ -343,12 +350,5 @@ def values_range(root, vals):
         vals.append(root["value"])
         values_range(root["right"], vals)
 
-def default_compare(key, element):
-    """Función de comparación por defecto. Compara una llave con la llave de un elemento llave-valor."""
-    if key < element["key"]:
-        return -1
-    elif key > element["key"]:
-        return 1
-    return 0
 
 
