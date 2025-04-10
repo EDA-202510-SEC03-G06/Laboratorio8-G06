@@ -1,354 +1,335 @@
 from DataStructures.List import single_linked_list as sl
 
-def new_map():
+def new_map(cmpfunction=None):
     """Crea un nuevo árbol de búsqueda"""
-    
-    return {'root': None, 'size': 0}
+    return {'root': None, 'size': 0, 'cmpfunction': cmpfunction}
 
 def new_node(key, value=None):
-    """Crea un nuevo nodo para el BST con la estructura solicitada:
-    - key: llave del nodo.
-    - value: valor asociado (opcional).
-    - size: tamaño del subárbol (inicialmente 1).
-    - left: hijo izquierdo (inicialmente None).
-    - right: hijo derecho (inicialmente None).
-    """
+    """Crea un nuevo nodo para el BST"""
     return {
         "key": key,
         "value": value,
         "left": None,
         "right": None,
-        "size": 1  
+        "size": 1
     }
 
 def _update_size(node):
-    """Actualiza el campo 'size' de un nodo basado en sus hijos."""
+    """Actualiza el tamaño de un nodo"""
     if node is None:
         return
     left_size = node["left"]["size"] if node["left"] else 0
     right_size = node["right"]["size"] if node["right"] else 0
     node["size"] = 1 + left_size + right_size
 
-def put(node, key, value):
-    """Agrega un nuevo nodo llave-valor a un árbol binario de búsqueda (BST). 
-    Si la llave ya existe, se actualiza el value del nodo."""
-    my_bst['root'] = insert_node(my_bst['root'], key, value, my_bst['cmpfunction'])
-    return my_bst
+def put(bst, key, value):
+    """Agrega un nuevo nodo llave-valor al BST"""
+    bst['root'] = _put(bst['root'], key, value, bst.get('cmpfunction'))
+    bst['size'] = size(bst)
+    return bst
 
-
-def insert_node(root, key, value):
-    """Inserta un nuevo nodo llave-valor en el árbol binario de búsqueda (BST) de manera recursiva.
-    Esta función es llamada por la función put"""
-    if root is None:
-        return {
-            'key': key,
-            'value': value,
-            'left': None,
-            'right': None,
-            'size': 1
-        }
-
-    comparison = cmpfunction(key, root['key'])
-
-    if comparison < 0:
-        root['left'] = insert_node(root['left'], key, value, cmpfunction)
-    elif comparison > 0:
-        root['right'] = insert_node(root['right'], key, value, cmpfunction)
+def _put(node, key, value, cmpfunction):
+    """Función auxiliar para put"""
+    if node is None:
+        return new_node(key, value)
+    
+    if cmpfunction:
+        cmp = cmpfunction(key, node)
     else:
-        root['value'] = value 
+        cmp = -1 if key < node["key"] else 1 if key > node["key"] else 0
+    
+    if cmp < 0:
+        node["left"] = _put(node["left"], key, value, cmpfunction)
+    elif cmp > 0:
+        node["right"] = _put(node["right"], key, value, cmpfunction)
+    else:
+        node["value"] = value
+    
+    _update_size(node)
+    return node
 
-    root['size'] = 1 + size_tree(root['left']) + size_tree(root['right'])
-    return root
-
-def get(root, key):
-    """Busca un nodo en el árbol binario de búsqueda (BST) y devuelve su valor.
-    Esta función llama a la función get_node para buscar el nodo en el árbol de manera recursiva."""
-    node = get_node(root, key)
+def get(bst, key):
+    """Obtiene el valor asociado a una llave"""
+    node = _get(bst['root'], key, bst.get('cmpfunction'))
     return node["value"] if node else None
 
-def get_node(root, key):
-    """Busca un nodo en el árbol binario de búsqueda (BST) y devuelve su valor.
-    Esta función llama a la función get_node para buscar el nodo en el árbol de manera recursiva."""
-    if root is None or "key" not in root:
+def _get(node, key, cmpfunction):
+    """Función auxiliar para get"""
+    if node is None:
         return None
-    if key == root["key"]:
-        return root["value"]
-    elif key < root["key"]:
-        return get_node(root["left"], key)
-    else:
-        return get_node(root["right"], key)
-
-def remove(root, key):
-    "elimina el nodo con la clave ``key`` del árbol"
     
-    return remove_node(root, key)
-
-def remove_node(root, key):
-    "Elimina la pareja llave-valor que coincida con``key`` es usada por la función remove"
-    if root is None:
-        return None
-    if key < root["key"]:
-        root["left"] = remove_node(root["left"], key)
-    elif key > root["key"]:
-        root["righ"] = remove_node(root["right"], key)
+    if cmpfunction:
+        cmp = cmpfunction(key, node)
     else:
-        if root["left"] is None:
-            return root["right"]
-        if root["right"] is None:
-            return root["left"]
-        successor = get_min_node(root["right"])
-        root["key"], root["value"] = successor["key"], successor["value"]
-        root["right"] = delete_min_tree(root["right"])
-    _update_size(root)
-    return root
+        cmp = -1 if key < node["key"] else 1 if key > node["key"] else 0
+    
+    if cmp < 0:
+        return _get(node["left"], key, cmpfunction)
+    elif cmp > 0:
+        return _get(node["right"], key, cmpfunction)
+    else:
+        return node
 
-def contains(my_bst, key):
-    """Devuelve True si el árbol de búsqueda contiene la llave ``key``, False en caso contrario."""
-    return get(my_bst, key) is not None
+def remove(bst, key):
+    """Elimina un nodo del BST"""
+    if bst['root'] is not None:
+        bst['root'] = _remove(bst['root'], key, bst.get('cmpfunction'))
+        bst['size'] = size(bst)
+    return bst
 
-def size(my_bst):
-    """Retorna el número de entradas en la tabla de simbolos
-    usa la función size_tree() para contar el número de elementos."""
-    return my_bst["size"] if my_bst else 0
+def _remove(node, key, cmpfunction):
+    """Función auxiliar para remove"""
+    if node is None:
+        return None
+    
+    if cmpfunction:
+        cmp = cmpfunction(key, node)
+    else:
+        cmp = -1 if key < node["key"] else 1 if key > node["key"] else 0
+    
+    if cmp < 0:
+        node["left"] = _remove(node["left"], key, cmpfunction)
+    elif cmp > 0:
+        node["right"] = _remove(node["right"], key, cmpfunction)
+    else:
+        if node["left"] is None:
+            return node["right"]
+        if node["right"] is None:
+            return node["left"]
+        
+        temp = _get_min_node(node["right"])
+        node["key"], node["value"] = temp["key"], temp["value"]
+        node["right"] = _delete_min(node["right"])
+    
+    _update_size(node)
+    return node
 
-def size_tree(root):
-    """Retornar el número de entradas en la a partir del nodo root
-    Es usada en la función size()"""
-    if root is None:
-        return 0
-    return 1 + size_tree(root['left']) + size_tree(root['right'])
+def contains(bst, key):
+    """Verifica si una llave existe en el BST"""
+    return _get(bst['root'], key, bst.get('cmpfunction')) is not None
 
-def is_empty(my_bst):
-    """Informa si la tabla de simbolos se encuentra vacia"""
-    return my_bst['root'] is None
+def size(bst):
+    """Retorna el número de elementos en el BST"""
+    return bst['size']
 
-def key_set(my_bst):
-    """Retorna una lista con todas las llaves de la tabla.
-    Usa la función key_set_tree() para construir la lista de llaves"""
-    keys = lt.newList('SINGLE_LINKED')  
-    key_set_tree(my_bst['root'], keys)
+def is_empty(bst):
+    """Verifica si el BST está vacío"""
+    return bst['root'] is None
+
+def key_set(bst):
+    """Retorna todas las llaves en orden"""
+    keys = sl.newList('SINGLE_LINKED')
+    _in_order(bst['root'], keys, 'key')
     return keys
 
-def value_set(my_bst):
-    """
-    Retorna una lista con todos los valores del árbol de búsqueda.
-
-    Parameters:
-    my_bst (dict): El árbol binario de búsqueda.
-
-    Returns:
-    linked_list: Lista enlazada con todos los valores del árbol.
-    """
-    values = lt.newList('SINGLE_LINKED')
-    value_set_tree(my_bst['root'], values)
+def value_set(bst):
+    """Retorna todos los valores en orden"""
+    values = sl.newList('SINGLE_LINKED')  # Usar la lista enlazada
+    _in_order(bst['root'], values, 'value')
     return values
 
-def keys_set_tree(root, keys):
-    if root:
-        keys_set_tree(root["left"], keys)
-        keys.append(root["key"])
-        keys_set_tree(root["right"], keys)
+def _in_order(node, result_list, attr):
+    """Recorrido in-order"""
+    if node is not None:
+        _in_order(node["left"], result_list, attr)
+        sl.addLast(result_list, node[attr])
+        _in_order(node["right"], result_list, attr)
 
-def get_min(my_bst):
-    """"Retorna la llave mas pequeña de la tabla de simbolos
-    Usa la función get_min_node() para encontrar la llave más a la izquierda"""
-    if is_empty(my_bst):
+def get_min(bst):
+    """Obtiene la llave mínima"""
+    if is_empty(bst):
         return None
-    return get_min_node(my_bst)["key"]
+    return _get_min_node(bst['root'])["key"]
 
-def get_min_node(root):
-    """Retorna la llave mas pequeña de la tabla de simbolos
-    Es usada en la función get_min()"""
-    min_node = get_min_node(my_bst['root'])
-    if min_node is not None:
-        return min_node['key']
-    return None
+def _get_min_node(node):
+    """Función auxiliar para get_min"""
+    while node["left"] is not None:
+        node = node["left"]
+    return node
 
-def get_max(my_bst):
-    """Retorna la llave mas grande de la tabla de simbolos
-    usa la función get_max_node() para encontrar la llave más grande de del arbol"""
-    if is_empty(my_bst):
+def get_max(bst):
+    """Obtiene la llave máxima"""
+    if is_empty(bst):
         return None
-    return get_max_node(my_bst)["key"]
-def get_max_node(root):
-    """"Retorna la llave mas grande de la tabla de simbolos
-    Es usada en la función get_max() Usa la función get_max_node() para encontrar la llave más grande"""
-    if root is None:
+    return _get_max_node(bst['root'])["key"]
+
+def _get_max_node(node):
+    """Función auxiliar para get_max"""
+    while node["right"] is not None:
+        node = node["right"]
+    return node
+
+def delete_min(bst):
+    """Elimina el nodo con la llave mínima"""
+    if bst['root'] is not None:
+        bst['root'] = _delete_min(bst['root'])
+        bst['size'] = size(bst)
+    return bst
+
+def _delete_min(node):
+    """Función auxiliar para delete_min"""
+    if node["left"] is None:
+        return node["right"]
+    node["left"] = _delete_min(node["left"])
+    _update_size(node)
+    return node
+
+def delete_max(bst):
+    """Elimina el nodo con la llave máxima"""
+    if bst['root'] is not None:
+        bst['root'] = _delete_max(bst['root'])
+        bst['size'] = size(bst)
+    return bst
+
+def _delete_max(node):
+    """Función auxiliar para delete_max"""
+    if node["right"] is None:
+        return node["left"]
+    node["right"] = _delete_max(node["right"])
+    _update_size(node)
+    return node
+
+def floor(bst, key):
+    """Encuentra el floor de una llave"""
+    node = _floor(bst['root'], key, bst.get('cmpfunction'))
+    return node["key"] if node else None
+
+def _floor(node, key, cmpfunction):
+    """Función auxiliar para floor"""
+    if node is None:
         return None
-    while root['right'] is not None:
-        root = root['right']
-    return root
-
-def delete_min_tree(root):
-    """Encuentra y remueve la llave mas pequeña de la tabla de simbolos y su valor asociado
-    Es usada en la función delete_min() Usa la función delete_min_tree() para eliminar la llave más pequeña"""
-    if root is None:
-        return None
-
-    if root['left'] is None:
-        return root['right'] 
-
-    root['left'] = delete_min_tree(root['left'])
-
-    left_size = root['left']['size'] if root['left'] else 0
-    right_size = root['right']['size'] if root['right'] else 0
-    root['size'] = 1 + left_size + right_size
-
-    return root
-
-def delete_min(my_bst):
-    """Encuentra y remueve la llave mas pequeña de la tabla de simbolos y su valor asociado.
-    Usa la función delete_min_tree() para eliminar la llave más pequeña"""
-    my_bst['root'] = delete_min_tree(my_bst['root'])
-    return my_bst
-
-def delete_max(my_bst):
-    """Encuentra y remueve la llave mas grande de la tabla de simbolos y su valor asociado.
-    Usa la función delete_max_tree() para eliminar la llave más grande"""
-    my_bst['root'] = delete_max_tree(my_bst['root'])
-    return my_bst
-
-
-def delete_max_tree(root):
-    """Encuentra y remueve la llave mas grande de la tabla de simbolos y su valor asociado
-    Es usada en la función delete_max() Usa la función delete_max_tree() para eliminar la llave más grande"""   
-    if root is None:
-        return None
-
-    if root['right'] is None:
-        return root['left']  
-
-    root['right'] = delete_max_tree(root['right'])
-
-    left_size = root['left']['size'] if root['left'] else 0
-    right_size = root['right']['size'] if root['right'] else 0
-    root['size'] = 1 + left_size + right_size
-
-    return root
-
-def floor(my_bst, key):
-    """Retorna la llave que precede a la llave key en la tabla de simbolos.
-    Si la llave existe, retorna la misma llave. Si no existe, retorna la llave predecedente más cercana como si la llave key existiera en la tabla. Por ejemplo, si la tabla contiene las llaves [1, 3, 5, 7, 9] y se busca la llave 6, la función retornará 5.
-    Usa la función floor_key() para encontrar la llave predecesora a key"""
-    node = floor_key(my_bst['root'], key)
-    return node['key'] if node else None
-
-
-def floor_key(root, key):
-    """Retorna la llave que precede a la llave key en la tabla de simbolos.
-    Si la llave existe, retorna la misma llave. Si no existe, retorna la llave predecedente más cercana como si la llave key existiera en la tabla.
-    Es usada en la función floor() Usa la función floor_key() para encontrar la llave predecesora a key"""
-    if root is None:
-        return None
-
-    if key == root['key']:
-        return root['key']
-    elif key < root['key']:
-        return floor_key(root['left'], key)
+    
+    if cmpfunction:
+        cmp = cmpfunction(key, node)
     else:
-        temp = floor_key(root['right'], key)
-        if temp is not None:
-            return temp
-        else:
-            return root['key']
+        cmp = -1 if key < node["key"] else 1 if key > node["key"] else 0
+    
+    if cmp == 0:
+        return node
+    if cmp < 0:
+        return _floor(node["left"], key, cmpfunction)
+    
+    temp = _floor(node["right"], key, cmpfunction)
+    return temp if temp is not None else node
 
+def ceiling(bst, key):
+    """Encuentra el ceiling de una llave"""
+    node = _ceiling(bst['root'], key, bst.get('cmpfunction'))
+    return node["key"] if node else None
 
-def ceiling(my_bst, key):
-    """Retorna la llave que sucede a la llave key en la tabla de simbolos.
-    Si la llave existe, retorna la misma llave. Si no existe, retorna la llave sucesora más cercana como si la llave key existiera en la tabla. Por ejemplo, si la tabla contiene las llaves [1, 3, 5, 7, 9] y se busca la llave 6, la función retornará 7.
-    Usa la función ceiling_key() para encontrar la llave sucesora a key"""
-    return ceiling_key(my_bst["root"], key)
-
-def ceiling_key(root, key):
+def _ceiling(node, key, cmpfunction):
     """Función auxiliar para ceiling"""
-    if root is None:
+    if node is None:
         return None
-    if key == root["key"]:
-        return root["key"]
-    if key > root["key"]:
-        return ceiling_key(root["right"], key)
-    temp = ceiling_key(root["left"], key)
-    return temp if temp is not None else root["key"]
+    
+    if cmpfunction:
+        cmp = cmpfunction(key, node)
+    else:
+        cmp = -1 if key < node["key"] else 1 if key > node["key"] else 0
+    
+    if cmp == 0:
+        return node
+    if cmp > 0:
+        return _ceiling(node["right"], key, cmpfunction)
+    
+    temp = _ceiling(node["left"], key, cmpfunction)
+    return temp if temp is not None else node
 
-def select(my_bst, pos):
-    """Retorna la siguiente llave a la k-esima llave de izquierda a derecha de la tabla de simbolos.
-    Usa la función select_key() para encontrar la llave en la posición pos"""
-    if pos < 1 or pos > size(my_bst):
+def select(bst, k):
+    """Selecciona la llave en la posición k (0-indexed)"""
+    if k < 0 or k >= size(bst):
         return None
-    return select_key(my_bst, pos)["key"]
+    return _select(bst['root'], k)["key"]
 
-def select_key(root, pos):
-    """Retorna la siguiente llave a la k-esima llave de izquierda a derecha de la tabla de simbolos.
-    Es usada en la función select() Usa la función select_key() para encontrar la llave en la posición pos"""   
-    left_size = size(root["left"])
-    if pos < left_size:
-        return select_key(root["left"], pos)
-    elif pos > left_size:
-        return select_key(root["right"], pos - left_size - 1)
-    return root
+def _select(node, k):
+    """Función auxiliar para select"""
+    if node is None:
+        return None
+    
+    left_size = node["left"]["size"] if node["left"] else 0
+    if k < left_size:
+        return _select(node["left"], k)
+    elif k > left_size:
+        return _select(node["right"], k - left_size - 1)
+    else:
+        return node
 
-def rank(my_bst, key):
-    """Retorna el número de llaves en la tabla que son estrictamente predecesoras a key Por ejemplo, si la tabla contiene las llaves [1, 3, 5, 7, 9] y se busca la llave 6, la función retornará 3.
-    Usa la función rank_keys() para encontrar el número de llaves predecesoras a keyo""" 
-    return rank_keys(my_bst, key)
+def rank(bst, key):
+    """Calcula el rank de una llave"""
+    return _rank(bst['root'], key, bst.get('cmpfunction'))
 
-def rank_keys(root, key):
-    """Retorna el número de llaves en la tabla que son estrictamente predecesoras a key Por ejemplo, si la tabla contiene las llaves [1, 3, 5, 7, 9] y se busca la llave 6, la función retornará 3.
-    Es usada en la función rank() Usa la función rank_keys() para encontrar el número de llaves predecesoras a key""" 
-    if root is None:
+def _rank(node, key, cmpfunction):
+    """Función auxiliar para rank"""
+    if node is None:
         return 0
-    if key < root["key"]:
-        return rank_keys(root["left"], key)
-    elif key > root["key"]:
-        return 1 + size(root["left"]) + rank_keys(root["right"], key)  
-    return size(root["left"])
+    
+    if cmpfunction:
+        cmp = cmpfunction(key, node)
+    else:
+        cmp = -1 if key < node["key"] else 1 if key > node["key"] else 0
+    
+    if cmp < 0:
+        return _rank(node["left"], key, cmpfunction)
+    elif cmp > 0:
+        return 1 + (node["left"]["size"] if node["left"] else 0) + _rank(node["right"], key, cmpfunction)
+    else:
+        return node["left"]["size"] if node["left"] else 0
 
-def height(root):
-    "devuelve la altura del arbol usa la función heigth_tree"
-    return heigth_tree(root)
+def height(bst):
+    """Calcula la altura del BST"""
+    return _height(bst['root'])
 
-def heigth_tree(root):
-    """Retorna la altura del arbol de busqueda
-    Es usada en la "función height()" Usa la función height_tree() para encontrar la altura del arbol"""
-    if root is None:
+def _height(node):
+    """Función auxiliar para height"""
+    if node is None:
+        return 0  # Cambiado de -1 a 0
+    return 1 + max(_height(node["left"]), _height(node["right"]))
+
+def keys(bst, lo, hi):
+    """Obtiene llaves en un rango"""
+    result = sl.newList('SINGLE_LINKED')
+    _keys(bst['root'], result, lo, hi, bst.get('cmpfunction'))
+    return result
+
+def _keys(node, result_list, lo, hi, cmpfunction):
+    """Función auxiliar para keys"""
+    if node is None:
+        return
+    
+    if cmpfunction:
+        cmp_lo = cmpfunction(lo, node)
+        cmp_hi = cmpfunction(hi, node)
+    else:
+        cmp_lo = -1 if lo < node["key"] else 1 if lo > node["key"] else 0
+        cmp_hi = -1 if hi < node["key"] else 1 if hi > node["key"] else 0
+    
+    if cmp_lo < 0:
+        _keys(node["left"], result_list, lo, hi, cmpfunction)
+    if cmp_lo <= 0 <= cmp_hi:
+        sl.addLast(result_list, node["key"])
+    if cmp_hi > 0:
+        _keys(node["right"], result_list, lo, hi, cmpfunction)
+
+def values(bst, lo=None, hi=None):
+    """Obtiene valores en un rango"""
+    result = sl.newList('SINGLE_LINKED')
+    if lo is None and hi is None:
+        _in_order(bst['root'], result, 'value')
+    else:
+        _keys(bst['root'], result, lo, hi, bst.get('cmpfunction'), attr='value')
+    return result
+
+
+def default_compare(key, node):
+    """Función de comparación por defecto"""
+    if key < node["key"]:
         return -1
-    return 1 + max(heigth_tree(root["left"]), heigth_tree(root["right"]))
+    elif key > node["key"]:
+        return 1
+    return 0
 
-def keys(my_bst, key_initial, key_final):
-    """Retorna todas las llaves del arbol que se encuentren entre [key_initial, key_final].
-    Usa la función keys_range() para encontrar las llaves en el rango especificado"""   
-    list_key = []
-    keys_range(my_bst, key_initial, key_final, list_key)
-    return list_key
-
-def keys_range(root, key_initial, key_final, list_key):   
-    """Retorna todas las llaves del arbol que se encuentren entre [key_initial, key_final].
-    Es usada en la función keys() Usa la función keys_range() para encontrar las llaves en el rango especificado"""
-    if root is None:
-        return  
-    if key_initial < root["key"]:
-        keys_range(root["left"], key_initial, key_final, list_key)
-    if key_initial <= root["key"] <= key_final:
-        sl.add_last(list_key, root["key"])
-    if root["key"] < key_final:
-        keys_range(root["right"], key_initial, key_final, list_key)
-
-def keys(my_bst, key_initial, key_final):
-    result_list = sl.new_list() 
-    keys_range(my_bst["root"], key_initial, key_final, result_list)
-    return result_list
-def values(root):
-    """Retorna todas los valores del arbol que se encuentren entre [key_initial, key_final]
-    Usa la función values_range() para encontrar los valores en el rango especificado"""
-    vals = []
-    values_range(root, vals)
-    return vals
-def values_range(root, vals):
-    """Función de comparación por defecto. Compara una llave con la llave de un elemento llave-valor."""
-    if root:
-        values_range(root["left"], vals)
-        vals.append(root["value"])
-        values_range(root["right"], vals)
-
-
-
+def _in_order_list(node, result_list, attr):
+    if node is not None:
+        _in_order_list(node["left"], result_list, attr)
+        result_list.append(node[attr])
+        _in_order_list(node["right"], result_list, attr)

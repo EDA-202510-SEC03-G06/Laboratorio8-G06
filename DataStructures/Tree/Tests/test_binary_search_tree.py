@@ -463,7 +463,7 @@ def test_rank():
 
 
 @handle_not_implemented
-def test_heigh():
+def test_height():
     empty_bst = setup_tests()
     three_bst = setup_three_nodes()
     seven_bst = setup_seven_nodes()
