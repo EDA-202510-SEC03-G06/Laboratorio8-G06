@@ -124,7 +124,7 @@ def key_set(bst):
 
 def value_set(bst):
     """Retorna todos los valores en orden"""
-    values = sl.newList('SINGLE_LINKED')  # Usar la lista enlazada
+    values = sl.newList('SINGLE_LINKED')
     _in_order(bst['root'], values, 'value')
     return values
 
